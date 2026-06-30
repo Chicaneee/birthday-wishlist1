@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Подарок на день рождения</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header" aria-label="Главная навигация">
+      <a class="brand" href="#top">wish stable</a>
+      <nav class="nav-links" aria-label="Разделы сайта">
+        <a href="#wishlist">Желания</a>
+        <a href="#fund">Копилка</a>
+        <a href="#how">Как подарить</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <img class="hero-image" src="assets/hero-stable.png" alt="Уютная конюшня с конной амуницией и подарками" />
+        <div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Birthday wishlist</p>
+          <h1 id="hero-title">Что подарить мне на день рождения</h1>
+          <p class="hero-copy">
+            Можно выбрать конкретную вещь для конюшни или добавить любую сумму в копилку мечты. Даже маленький вклад
+            будет очень к месту.
+          </p>
+
+          <div class="hero-actions">
+            <a class="button button-primary" href="#wishlist">Выбрать подарок</a>
+            <a class="button button-secondary" href="#fund" data-select-target="lyubchik">Копилка на Любчика</a>
+          </div>
+
+          <div class="hero-progress" aria-label="Прогресс копилки мечты">
+            <span class="progress-label">Копилка на Любчика</span>
+            <strong id="heroProgressText">0 из 0 грн</strong>
+            <div class="progress-track">
+              <span id="heroProgressBar" class="progress-fill"></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section-intro" aria-label="Коротко о подарке">
+        <div class="section-inner intro-grid">
+          <div>
+            <p class="eyebrow">Можно частями</p>
+            <h2>Не обязательно закрывать всю стоимость</h2>
+          </div>
+          <p>
+            Для каждого желания видно примерную цену и сколько уже собрано. Можно оплатить часть, забронировать подарок
+            или просто скинуть сумму, которую хочется.
+          </p>
+        </div>
+      </section>
+
+      <section id="wishlist" class="section" aria-labelledby="wishlist-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <p class="eyebrow">Wishlist</p>
+            <h2 id="wishlist-title">Варианты подарков</h2>
+          </div>
+          <div id="wishlistGrid" class="wishlist-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="fund" class="section fund-section" aria-labelledby="fund-title">
+        <div class="section-inner fund-layout">
+          <div class="fund-copy">
+            <p class="eyebrow">Dream fund</p>
+            <h2 id="fund-title">Копилка на Любчика</h2>
+            <p id="fundDescription">
+              Главная цель — выкупить Любчика, пони, которого я очень хочу забрать себе. Если сложно выбрать вещь,
+              можно добавить любую сумму именно в эту копилку или переключиться на аренду Карата.
+            </p>
+          </div>
+
+          <form class="gift-form" id="giftForm">
+            <p class="selected-target">Выбрано: <strong id="selectedTargetName">Копилка на Любчика</strong></p>
+            <div class="fund-choice" id="targetChoices" aria-label="Быстрый выбор копилки"></div>
+            <label for="giftAmount">Сумма подарка</label>
+            <div class="amount-row">
+              <input id="giftAmount" name="giftAmount" type="number" min="1" step="1" value="500" />
+              <span>грн</span>
+            </div>
+            <div class="quick-amounts" aria-label="Быстрый выбор суммы">
+              <button type="button" data-amount="300">300</button>
+              <button type="button" data-amount="500">500</button>
+              <button type="button" data-amount="1000">1000</button>
+            </div>
+            <button class="button button-primary full-width" type="submit">Открыть банку Monobank</button>
+            <p class="form-note">Сумму можно будет ввести уже на странице Monobank.</p>
+          </form>
+        </div>
+      </section>
+
+      <section id="how" class="section how-section" aria-labelledby="how-title">
+        <div class="section-inner">
+          <div class="section-heading">
+            <p class="eyebrow">Как это работает</p>
+            <h2 id="how-title">Три простых варианта</h2>
+          </div>
+          <div class="steps">
+            <article tabindex="0" data-scroll-target="#wishlist">
+              <span>01</span>
+              <h3>Выбрать вещь</h3>
+              <p>Можно подарить конкретную вещь: например, вальтрап — мягкую подкладку под седло, ушки или другой пункт из списка.</p>
+            </article>
+            <article tabindex="0" data-scroll-target="#fund">
+              <span>02</span>
+              <h3>Внести часть</h3>
+              <p>Можно скинуть любую сумму в копилку мечты.</p>
+            </article>
+            <article tabindex="0" data-scroll-target="#wishlist">
+              <span>03</span>
+              <h3>Забронировать</h3>
+              <p>Можно застолбить подарок заранее, чтобы он не пересекся с чужим.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+    <template id="wishTemplate">
+      <article class="wish-card">
+        <img class="wish-image" alt="" />
+        <div class="wish-body">
+          <div class="wish-topline">
+            <span class="wish-tag"></span>
+            <span class="wish-price"></span>
+          </div>
+          <h3></h3>
+          <p class="wish-description"></p>
+          <p class="reserve-status" hidden>Забронировано</p>
+          <div class="wish-progress">
+            <div class="wish-progress-copy">
+              <span class="wish-collected"></span>
+              <span class="wish-left"></span>
+            </div>
+            <div class="progress-track">
+              <span class="progress-fill"></span>
+            </div>
+          </div>
+          <div class="wish-actions">
+            <button class="button button-primary" type="button" data-action="partial">Внести часть</button>
+            <button class="button button-ghost" type="button" data-action="reserve">Забронировать</button>
+            <a class="button button-link" target="_blank" rel="noopener" data-action="product-link">Перейти к товару</a>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
