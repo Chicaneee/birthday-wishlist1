@@ -8,7 +8,7 @@
   </head>
   <body>
     <header class="site-header" aria-label="Главная навигация">
-      <a class="brand" href="#top">wish stable</a>
+      <a class="brand" href="#top">birthday wishlist</a>
       <nav class="nav-links" aria-label="Разделы сайта">
         <a href="#wishlist">Желания</a>
         <a href="#fund">Копилка</a>
@@ -18,23 +18,23 @@
 
     <main id="top">
       <section class="hero" aria-labelledby="hero-title">
-        <img class="hero-image" src="assets/hero-stable.png" alt="Уютная конюшня с конной амуницией и подарками" />
+        <img class="hero-image" src="assets/gift-hero.jpg" alt="Подарки, конверт с деньгами и рукодельные мелочи на столе" />
         <div class="hero-shade" aria-hidden="true"></div>
         <div class="hero-content">
           <p class="eyebrow">Birthday wishlist</p>
           <h1 id="hero-title">Что подарить мне на день рождения</h1>
           <p class="hero-copy">
-            Можно выбрать конкретную вещь для конюшни или добавить любую сумму в копилку мечты. Даже маленький вклад
-            будет очень к месту.
+            Можно выбрать конкретную идею из списка, забронировать подарок заранее или просто отправить любую
+            комфортную сумму в копилку.
           </p>
 
           <div class="hero-actions">
             <a class="button button-primary" href="#wishlist">Выбрать подарок</a>
-            <a class="button button-secondary" href="#fund" data-select-target="lyubchik">Копилка на Любчика</a>
+            <a class="button button-secondary" href="#fund" data-select-target="money-gift">Денежная копилка</a>
           </div>
 
-          <div class="hero-progress" aria-label="Прогресс копилки мечты">
-            <span class="progress-label">Копилка на Любчика</span>
+          <div class="hero-progress" aria-label="Денежная копилка">
+            <span class="progress-label">Денежная копилка</span>
             <strong id="heroProgressText">0 из 0 грн</strong>
             <div class="progress-track">
               <span id="heroProgressBar" class="progress-fill"></span>
@@ -50,8 +50,8 @@
             <h2>Не обязательно закрывать всю стоимость</h2>
           </div>
           <p>
-            Для каждого желания видно примерную цену и сколько уже собрано. Можно оплатить часть, забронировать подарок
-            или просто скинуть сумму, которую хочется.
+            Я собрала варианты с ссылками: что-то уютное для комнаты, милые штуки для дома, вкусняшки для конюшни и
+            пару подарков просто для радости. Самое главное — не цена, а внимание.
           </p>
         </div>
       </section>
@@ -70,15 +70,15 @@
         <div class="section-inner fund-layout">
           <div class="fund-copy">
             <p class="eyebrow">Dream fund</p>
-            <h2 id="fund-title">Копилка на Любчика</h2>
+            <h2 id="fund-title">Денежная копилка</h2>
             <p id="fundDescription">
-              Главная цель — выкупить Любчика, пони, которого я очень хочу забрать себе. Если сложно выбрать вещь,
-              можно добавить любую сумму именно в эту копилку или переключиться на аренду Карата.
+              Если не хочется выбирать конкретную вещь, можно просто отправить любую комфортную сумму. Сейчас это самый
+              полезный и спокойный вариант.
             </p>
           </div>
 
           <form class="gift-form" id="giftForm">
-            <p class="selected-target">Выбрано: <strong id="selectedTargetName">Копилка на Любчика</strong></p>
+            <p class="selected-target">Выбрано: <strong id="selectedTargetName">Деньги в копилку</strong></p>
             <div class="fund-choice" id="targetChoices" aria-label="Быстрый выбор копилки"></div>
             <label for="giftAmount">Сумма подарка</label>
             <div class="amount-row">
@@ -105,18 +105,18 @@
           <div class="steps">
             <article tabindex="0" data-scroll-target="#wishlist">
               <span>01</span>
-              <h3>Выбрать вещь</h3>
-              <p>Можно подарить конкретную вещь: например, вальтрап — мягкую подкладку под седло, ушки или другой пункт из списка.</p>
+              <h3>Выбрать подарок</h3>
+              <p>Можно открыть список, посмотреть картинки и перейти по ссылке на конкретный товар.</p>
             </article>
             <article tabindex="0" data-scroll-target="#fund">
               <span>02</span>
-              <h3>Внести часть</h3>
-              <p>Можно скинуть любую сумму в копилку мечты.</p>
+              <h3>Открыть банку</h3>
+              <p>Если хочется подарить деньги, можно отправить любую комфортную сумму через Monobank.</p>
             </article>
             <article tabindex="0" data-scroll-target="#wishlist">
               <span>03</span>
               <h3>Забронировать</h3>
-              <p>Можно застолбить подарок заранее, чтобы он не пересекся с чужим.</p>
+              <p>Если хочется подарить вещь, можно отметить её как забронированную.</p>
             </article>
           </div>
         </div>

@@ -372,7 +372,8 @@ input:focus-visible {
 .wish-image {
   width: 100%;
   aspect-ratio: 4 / 3;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 8px;
   background: var(--mist);
 }
 
@@ -436,7 +437,8 @@ input:focus-visible {
 }
 
 .wish-actions {
-  margin-top: 18px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .wish-actions .button {
@@ -782,7 +784,7 @@ input:focus-visible {
     margin: 10px 0 14px;
     overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 3;
   }
 
   .reserve-status {
@@ -798,7 +800,7 @@ input:focus-visible {
 
   .wish-actions {
     grid-template-columns: 1fr;
-    margin-top: 14px;
+    padding-top: 14px;
   }
 
   .wish-actions .button {

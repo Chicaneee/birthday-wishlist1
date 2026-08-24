@@ -3,161 +3,139 @@ const LEGACY_STORAGE_KEYS = ["birthdayWishlistCollected", "birthdayWishlistColle
 const RESERVATION_STORAGE_KEY = "wishlistReservationsV2";
 const LEGACY_RESERVATION_STORAGE_KEYS = ["wishlistReservations"];
 const RESERVATION_REFRESH_MS = 4000;
+const RESERVATION_API_URL =
+  "https://script.google.com/macros/s/AKfycby47Ypd1zEM2VjmQYGtLBh-4WzmwOGyAIiC-7RdYYAjZqqbcakVxnS_OMQgem7dON-krg/exec";
 const RESERVATION_API_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"];
 
 const profile = {
   name: "Стар",
-  mainTargetId: "lyubchik",
+  mainTargetId: "money-gift",
 };
 
 const targets = [
   {
-    id: "lyubchik",
-    title: "Покупка Любчика",
-    shortTitle: "Копилка на Любчика",
-    tag: "главная копилка",
-    price: 26929,
+    id: "money-gift",
+    title: "Денежный подарок",
+    shortTitle: "Деньги в копилку",
+    tag: "любая сумма",
+    price: 0,
+    priceLabel: "любая сумма",
     collected: 0,
     currency: "UAH",
-    image: "assets/hero-stable.png",
-    description: "Любчик — пони, которого я очень хочу выкупить. Это самая большая и самая важная мечта.",
-    fundTitle: "Копилка на Любчика",
-    fundDescription: "Главная цель — выкупить Любчика, пони, которого я очень хочу забрать себе.",
-    quickAmounts: [500, 1000, 3000],
+    image: "assets/money-gift.png",
+    description: "Самый актуальный вариант сейчас: можно отправить любую комфортную сумму в копилку.",
+    fundTitle: "Денежная копилка",
+    fundDescription: "Если не хочется выбирать конкретную вещь, можно просто отправить любую комфортную сумму. Сейчас это самый полезный и спокойный вариант.",
+    quickAmounts: [100, 300, 500],
     monoJarUrl: "https://send.monobank.ua/jar/9pQWkwUwpQ",
+    reservable: false,
   },
   {
-    id: "anemone-saddle-pad",
-    title: "Вальтрап Anemone",
-    tag: "для тренировок",
-    price: 4937,
+    id: "handmade-gift",
+    title: "Что-то своими руками",
+    tag: "своими руками",
+    price: 0,
+    priceLabel: "без цены",
     collected: 0,
     currency: "UAH",
-    image: "assets/anemone-saddle-pad-cutout.png",
-    description: "Вальтрап Anemone — мягкая подкладка между седлом и спиной лошади. Он нужен, чтобы лошади было комфортнее и ничего не натирало.",
-    fundTitle: "Копилка на вальтрап Anemone",
-    fundDescription: "Эта копилка относится только к вальтрапу Anemone. Вальтрап — это мягкая подкладка под седло, чтобы лошади было комфортнее.",
+    image: "assets/handmade-gift.jpg",
+    description: "Открытка, браслет, рисунок, маленькая поделка или что-то с душой. Такой подарок не обязан быть дорогим.",
+    quickAmounts: [100, 300, 500],
+    reservable: true,
+  },
+  {
+    id: "big-plush",
+    title: "Большая игрушка Stitch",
+    tag: "мягкая игрушка",
+    price: 0,
+    priceLabel: "любая",
+    collected: 0,
+    currency: "UAH",
+    image: "assets/stitch-plush-photo.jpg",
+    description: "Большая мягкая игрушка Stitch, любая. Главное, чтобы она была большая и мягкая.",
     quickAmounts: [300, 500, 1000],
-    link: "https://equestrianstockholm.com/products/jump-saddle-pad-anemone-full",
-    monoJarUrl: "https://send.monobank.ua/jar/4TkhDeATb9",
+    reservable: true,
   },
   {
-    id: "anemone-ear-bonnet",
-    title: "Ушки Anemone",
-    tag: "чтобы конь не пугался",
-    price: 3141,
+    id: "cat-photo-pillow",
+    title: "Подушка с фото Белки",
+    tag: "уютная штука",
+    price: 519,
+    priceLabel: "от 519 грн",
     collected: 0,
     currency: "UAH",
-    image: "assets/anemone-ear-bonnet-cutout.png",
-    description: "Ушки Anemone — шапочка на уши лошади. Она приглушает резкие звуки, чтобы коню было спокойнее на тренировке.",
-    fundTitle: "Копилка на ушки Anemone",
-    fundDescription: "Эта копилка относится только к ушкам Anemone. Можно внести любую часть суммы.",
-    quickAmounts: [200, 500, 1000],
-    link: "https://equestrianstockholm.com/products/ear-bonnet-anemone",
-    monoJarUrl: "https://send.monobank.ua/jar/74TSFdmiR6",
+    image: "assets/cat-pillow.jpg",
+    description: "Подушка с фото Белки, моей кошки. Если захочется заказать именно её, можно написать мне, и я скину фото Белки для печати.",
+    quickAmounts: [200, 500, 700],
+    link: "https://impillowqueen.com.ua/product/indyvidualna-podushka-z-vashym-puhnastykom/?attribute_pa_size=malenka-35-sm",
+    reservable: true,
   },
   {
-    id: "sycamore-ear-bonnet",
-    title: "Ушки Sycamore Green",
-    tag: "чтобы конь не пугался",
-    price: 3140,
+    id: "night-light",
+    title: "Деревянный LED-ночник",
+    tag: "для комнаты",
+    price: 1690,
     collected: 0,
     currency: "UAH",
-    image: "assets/sycamore-ear-bonnet-cutout.png",
-    description: "Ушки Sycamore Green — шапочка на уши лошади. Она защищает от шума и подходит к зелёному комплекту.",
-    fundTitle: "Копилка на ушки Sycamore Green",
-    fundDescription: "Эта копилка относится только к ушкам Sycamore Green.",
-    quickAmounts: [200, 500, 1000],
-    link: "https://equestrianstockholm.com/products/ear-bonnet-sycamore-green?pr_prod_strat=pinned&pr_rec_id=fa47a877c&pr_rec_pid=7764476199112&pr_ref_pid=7764476100808&pr_seq=uniform",
-    monoJarUrl: "https://send.monobank.ua/jar/7cVH1Q12o3",
+    image: "assets/night-light.jpg",
+    description: "Уютный деревянный ночник с мягким светом.",
+    quickAmounts: [300, 700, 1000],
+    link: "https://woodone.if.ua/ua/p3130086468-derevyannyj-led-nochnik.html",
+    reservable: true,
   },
   {
-    id: "sycamore-saddle-pad",
-    title: "Вальтрап Sycamore Green",
-    tag: "для тренировок",
-    price: 4937,
+    id: "soap-dispenser",
+    title: "Автоматический дозатор мыла",
+    tag: "смешная штука",
+    price: 1500,
     collected: 0,
     currency: "UAH",
-    image: "assets/sycamore-saddle-pad-cutout.png",
-    description: "Вальтрап Sycamore Green — мягкая подкладка между седлом и спиной лошади, чтобы было комфортнее и не натирало.",
-    fundTitle: "Копилка на вальтрап Sycamore Green",
-    fundDescription: "Эта копилка относится только к вальтрапу Sycamore Green. Вальтрап — это мягкая подкладка под седло для комфорта лошади.",
+    image: "assets/soap-dispenser.jpg",
+    description: "Подносишь руки, и он сам выдаёт пену.",
     quickAmounts: [300, 500, 1000],
-    link: "https://equestrianstockholm.com/products/jump-saddle-pad-sycamore-green-full?variant=43752748581064",
-    monoJarUrl: "https://send.monobank.ua/jar/73stkkmpnD",
+    link: "https://prom.ua/p2889325155-dozator-sensornyj-dlya.html",
+    reservable: true,
   },
   {
-    id: "kingsland-lucca-halter",
-    title: "Недоуздок Kingsland Lucca",
-    tag: "с чомбуром",
-    price: 3577,
+    id: "horse-treats",
+    title: "Вкусняшки для лошадей",
+    tag: "для конюшни",
+    price: 222,
     collected: 0,
     currency: "UAH",
-    image: "assets/kingsland-lucca-halter-cutout.png",
-    description: "Недоуздок — это как мягкая «уздечка» без железа во рту: надевается на голову, чтобы вести или привязывать лошадь. В комплекте есть чомбур.",
-    fundTitle: "Копилка на Kingsland Lucca",
-    fundDescription: "Эта копилка относится только к комплекту Kingsland Lucca Halter and Rope.",
-    quickAmounts: [300, 500, 1000],
-    link: "https://kingslandequestrian.com/products/kllucca-halter-and-rope",
-    monoJarUrl: "https://send.monobank.ua/jar/5AmtfntL4N",
+    image: "assets/horse-treats-likit.jpg",
+    description: "Прикольные лакомства для лошадей, которые можно взять на конюшню и угостить после тренировки.",
+    quickAmounts: [100, 200, 300],
+    link: "https://la-shop.com.ua/ua/plitka-konfetka-ot-likit-17246",
+    reservable: true,
   },
   {
-    id: "eskadron-halter",
-    title: "Недоуздок Eskadron",
-    tag: "с мехом",
-    price: 3060,
+    id: "fried-ice-cream-maker",
+    title: "Аппарат для жареного мороженого",
+    tag: "для вкусных экспериментов",
+    price: 0,
+    priceLabel: "цена по ссылке",
     collected: 0,
     currency: "UAH",
-    image: "assets/eskadron-halter-cutout.png",
-    description: "Недоуздок Eskadron — штука на голову лошади без железа во рту, чтобы вести её рядом. Мех делает его мягче и помогает не натирать.",
-    fundTitle: "Копилка на недоуздок Eskadron",
-    fundDescription: "Эта копилка относится только к недоуздку Eskadron с мехом.",
-    quickAmounts: [300, 500, 1000],
-    link: "https://happyhorse.net.ua/ua/product/nedouzdok-s-mehom-classic-sports-pin-bucklesheepskin-eskadron",
-    monoJarUrl: "https://send.monobank.ua/jar/2m9ZU3a1BX",
-  },
-  {
-    id: "hv-polo-lead-rope",
-    title: "Чомбур HV Polo",
-    tag: "с безопасным карабином",
-    price: 770,
-    collected: 0,
-    currency: "UAH",
-    image: "assets/hv-polo-lead-rope-cutout.png",
-    description: "Чомбур HV Polo — специальная верёвка с карабином. Её пристёгивают к недоуздку, чтобы вести лошадь рядом.",
-    fundTitle: "Копилка на чомбур HV Polo",
-    fundDescription: "Эта копилка относится только к чомбуру HV Polo с безопасным карабином.",
-    quickAmounts: [100, 200, 500],
-    link: "https://happyhorse.net.ua/ua/product/chombur-s-bezopasnym-karabinom-hatton-ph-hv-polo",
-    monoJarUrl: "https://send.monobank.ua/jar/2fxjV22bAf",
-  },
-  {
-    id: "karat-rent",
-    title: "Аренда Карата",
-    tag: "Большая мечта",
-    price: 44882,
-    collected: 0,
-    currency: "UAH",
-    image: "assets/karat-photo.jpeg",
-    description: "Аренда нужна, чтобы регулярно работать с конкретным конём. Когда я беру коня в аренду, прогресс идёт очень быстро.",
-    fundTitle: "Копилка на аренду Карата",
-    fundDescription: "Аренда нужна, чтобы регулярно работать с конкретным конём. Когда я беру коня в аренду, прогресс идёт очень быстро. Карат мне очень нравится, а месяц аренды стоит примерно 44 882 грн / $1 000.",
-    quickAmounts: [1000, 3000, 5000],
-    monoJarUrl: "https://send.monobank.ua/jar/A25X9vzyXN",
+    image: "assets/fried-ice-cream-photo.jpg",
+    description: "Штука, чтобы дома делать мороженое на холодной поверхности: смешивать добавки и скручивать красивые роллы.",
+    quickAmounts: [500, 1000, 1500],
+    link: "https://stall.ua/ru/product/19840/",
+    reservable: true,
   },
 ];
 
 const cardTargetIds = [
-  "anemone-saddle-pad",
-  "anemone-ear-bonnet",
-  "sycamore-ear-bonnet",
-  "sycamore-saddle-pad",
-  "kingsland-lucca-halter",
-  "eskadron-halter",
-  "hv-polo-lead-rope",
-  "karat-rent",
+  "money-gift",
+  "handmade-gift",
+  "big-plush",
+  "cat-photo-pillow",
+  "night-light",
+  "soap-dispenser",
+  "horse-treats",
+  "fried-ice-cream-maker",
 ];
-const choiceTargetIds = ["lyubchik", ...cardTargetIds];
+const choiceTargetIds = ["money-gift"];
 const money = new Intl.NumberFormat("ru-RU", {
   maximumFractionDigits: 2,
 });
@@ -175,6 +153,7 @@ const toast = document.querySelector("#toast");
 
 let selectedTargetId = profile.mainTargetId;
 let reservations = {};
+let reservationsApiAvailable = canUseReservationApi();
 
 function formatMoney(value, currency = "UAH") {
   if (currency === "USD") {
@@ -229,11 +208,17 @@ function renderHeroProgress() {
   const text = document.querySelector("#heroProgressText");
   const bar = document.querySelector("#heroProgressBar");
 
-  text.textContent = `${formatMoney(mainTarget.collected, mainTarget.currency)} из ${formatMoney(
-    mainTarget.price,
-    mainTarget.currency,
-  )}`;
-  setProgress(bar, mainTarget.collected, mainTarget.price);
+  if (mainTarget.price > 0) {
+    text.textContent = `${formatMoney(mainTarget.collected, mainTarget.currency)} из ${formatMoney(
+      mainTarget.price,
+      mainTarget.currency,
+    )}`;
+    setProgress(bar, mainTarget.collected, mainTarget.price);
+    return;
+  }
+
+  text.textContent = "любая сумма";
+  setProgress(bar, 0, 1);
 }
 
 function renderTargetChoices() {
@@ -260,8 +245,11 @@ function renderWishes() {
   cardTargetIds.forEach((targetId) => {
     const wish = getTarget(targetId);
     const card = wishTemplate.content.firstElementChild.cloneNode(true);
+    const hasFixedPrice = wish.price > 0;
+    const canContribute = hasJarLink(wish);
+    const showsProgress = hasFixedPrice && canContribute;
     const left = Math.max(wish.price - wish.collected, 0);
-    const isReservable = wish.id !== "karat-rent";
+    const isReservable = wish.reservable !== false;
     const reserved = isReservable && reservations[wish.id] === true;
 
     card.dataset.targetId = wish.id;
@@ -270,35 +258,53 @@ function renderWishes() {
     card.querySelector(".wish-image").src = wish.image;
     card.querySelector(".wish-image").alt = wish.title;
     card.querySelector(".wish-tag").textContent = wish.tag;
-    card.querySelector(".wish-price").textContent = formatMoney(wish.price, wish.currency);
+    card.querySelector(".wish-price").textContent = wish.priceLabel || (hasFixedPrice
+      ? formatMoney(wish.price, wish.currency)
+      : canContribute
+        ? "любая сумма"
+        : "без фиксированной цены");
     card.querySelector("h3").textContent = wish.title;
     card.querySelector(".wish-description").textContent = wish.description;
-    card.querySelector(".wish-collected").textContent = `Собрано ${formatMoney(wish.collected, wish.currency)}`;
-    card.querySelector(".wish-left").textContent =
-      left > 0 ? `Осталось ${formatMoney(left, wish.currency)}` : "Собрано";
-    setProgress(card.querySelector(".progress-fill"), wish.collected, wish.price);
+
+    if (showsProgress) {
+      card.querySelector(".wish-collected").textContent = `Собрано ${formatMoney(wish.collected, wish.currency)}`;
+      card.querySelector(".wish-left").textContent =
+        left > 0 ? `Осталось ${formatMoney(left, wish.currency)}` : "Собрано";
+      setProgress(card.querySelector(".progress-fill"), wish.collected, wish.price);
+    } else {
+      card.querySelector(".wish-progress").remove();
+    }
+
     card.querySelector(".reserve-status").hidden = !reserved;
 
     card.addEventListener("click", (event) => {
       if (event.target.closest("button, a")) return;
+      if (!canContribute) {
+        showToast(`Можно забронировать: ${wish.title}.`);
+        return;
+      }
+
       selectTarget(wish.id);
-      showToast(`Выбрано: ${wish.title}. Можно внести часть ниже.`);
+      showToast(`Выбрано: ${wish.title}. Можно внести сумму ниже.`);
     });
 
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
+      if (!canContribute) return;
       selectTarget(wish.id, { scroll: true, amount: getSuggestedAmount(wish) });
-    });
-
-    card.querySelector('[data-action="partial"]').addEventListener("click", () => {
-      selectTarget(wish.id, { scroll: true, amount: getSuggestedAmount(wish) });
-      showToast(`Выбрано: ${wish.title}. Поставила примерную сумму, ее можно поменять.`);
     });
 
     const partialButton = card.querySelector('[data-action="partial"]');
-    partialButton.disabled = reserved;
-    partialButton.textContent = reserved ? "Уже забронировано" : "Внести часть";
+    if (canContribute) {
+      partialButton.textContent = "Внести сумму";
+      partialButton.addEventListener("click", () => {
+        selectTarget(wish.id, { scroll: true, amount: getSuggestedAmount(wish) });
+        showToast(`Выбрано: ${wish.title}. Сумму можно поменять.`);
+      });
+    } else {
+      partialButton.remove();
+    }
 
     const reserveButton = card.querySelector('[data-action="reserve"]');
     if (isReservable) {
@@ -322,9 +328,11 @@ function renderWishes() {
 }
 
 function getSuggestedAmount(target) {
-  const left = Math.max(target.price - target.collected, 0);
   const amounts = target.quickAmounts;
 
+  if (target.price <= 0) return amounts[1] || amounts[0];
+
+  const left = Math.max(target.price - target.collected, 0);
   if (!left) return amounts[1] || amounts[0];
   return Math.min(Math.max(left, amounts[0]), amounts[amounts.length - 1]);
 }
@@ -419,21 +427,82 @@ function openJar(target) {
 }
 
 function canUseReservationApi() {
-  const hostname = window.location.hostname;
+  return Boolean(getReservationApiUrl());
+}
 
-  return RESERVATION_API_HOSTS.includes(hostname) || hostname.startsWith("192.168.");
+function getReservationApiUrl() {
+  if (RESERVATION_API_URL) return RESERVATION_API_URL;
+
+  const hostname = window.location.hostname;
+  const isLocalHost = RESERVATION_API_HOSTS.includes(hostname) || hostname.startsWith("192.168.");
+
+  return isLocalHost ? "/api/reservations" : "";
+}
+
+function isRemoteReservationApi() {
+  const apiUrl = getReservationApiUrl();
+
+  return apiUrl && !apiUrl.startsWith("/");
+}
+
+function requestRemoteReservations(params = {}) {
+  const apiUrl = getReservationApiUrl();
+
+  return new Promise((resolve, reject) => {
+    const callbackName = `wishlistReservationCallback${Date.now()}${Math.random().toString(36).slice(2)}`;
+    const url = new URL(apiUrl);
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[callbackName];
+      script.remove();
+      window.clearTimeout(timeout);
+    };
+    const timeout = window.setTimeout(() => {
+      cleanup();
+      reject(new Error("Reservation API unavailable"));
+    }, 8000);
+
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.set(key, value);
+    });
+    url.searchParams.set("callback", callbackName);
+
+    window[callbackName] = (payload) => {
+      cleanup();
+      resolve(payload);
+    };
+
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Reservation API unavailable"));
+    };
+
+    script.src = url.toString();
+    document.head.append(script);
+  });
 }
 
 async function loadReservations() {
   try {
     LEGACY_RESERVATION_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
-    if (!canUseReservationApi()) throw new Error("Reservation API unavailable");
+    const apiUrl = getReservationApiUrl();
+    if (!reservationsApiAvailable) throw new Error("Reservation API unavailable");
+    if (!apiUrl) throw new Error("Reservation API unavailable");
 
-    const response = await fetch("/api/reservations", { cache: "no-store" });
-    if (!response.ok) throw new Error("Reservation API unavailable");
-    reservations = normalizeReservations(await response.json());
+    let payload;
+    if (isRemoteReservationApi()) {
+      payload = await requestRemoteReservations({ action: "list" });
+    } else {
+      const response = await fetch(apiUrl, { cache: "no-store" });
+      if (!response.ok) throw new Error("Reservation API unavailable");
+      payload = await response.json();
+    }
+
+    reservationsApiAvailable = true;
+    reservations = normalizeReservations(payload);
     localStorage.removeItem(RESERVATION_STORAGE_KEY);
   } catch (error) {
+    reservationsApiAvailable = false;
     reservations = normalizeReservations(JSON.parse(localStorage.getItem(RESERVATION_STORAGE_KEY) || "{}"));
   }
 
@@ -456,17 +525,32 @@ async function setReservation(targetId, reserved) {
   updateSelectionUI();
 
   try {
-    if (!canUseReservationApi()) throw new Error("Reservation API unavailable");
+    const apiUrl = getReservationApiUrl();
+    if (!reservationsApiAvailable) throw new Error("Reservation API unavailable");
+    if (!apiUrl) throw new Error("Reservation API unavailable");
 
-    const response = await fetch("/api/reservations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: targetId, reserved }),
-    });
+    let payload;
+    if (isRemoteReservationApi()) {
+      payload = await requestRemoteReservations({
+        action: "set",
+        id: targetId,
+        reserved: reserved ? "1" : "0",
+      });
+    } else {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ id: targetId, reserved }),
+      });
 
-    if (!response.ok) throw new Error("Reservation API unavailable");
-    reservations = normalizeReservations(await response.json());
+      if (!response.ok) throw new Error("Reservation API unavailable");
+      payload = await response.json();
+    }
+
+    reservationsApiAvailable = true;
+    reservations = normalizeReservations(payload);
   } catch (error) {
+    reservationsApiAvailable = false;
     localStorage.setItem(RESERVATION_STORAGE_KEY, JSON.stringify(reservations));
   }
 
@@ -522,7 +606,8 @@ renderTargetChoices();
 renderHeroProgress();
 renderWishes();
 selectTarget(profile.mainTargetId, { amount: getSuggestedAmount(getTarget(profile.mainTargetId)) });
-loadReservations();
-if (canUseReservationApi()) {
-  window.setInterval(loadReservations, RESERVATION_REFRESH_MS);
-}
+loadReservations().then(() => {
+  if (reservationsApiAvailable) {
+    window.setInterval(loadReservations, RESERVATION_REFRESH_MS);
+  }
+});
