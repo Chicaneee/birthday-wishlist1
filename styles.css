@@ -369,6 +369,10 @@ input:focus-visible {
   background: #f8faf7;
 }
 
+.wish-card.is-counted {
+  border-color: rgba(40, 79, 61, 0.34);
+}
+
 .wish-image {
   width: 100%;
   aspect-ratio: 4 / 3;
@@ -455,6 +459,48 @@ input:focus-visible {
   flex-basis: 100%;
   min-height: 30px;
   justify-content: flex-start;
+}
+
+.gift-count-control {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 10px;
+}
+
+.gift-count-control .gift-count-button {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 9px 14px;
+}
+
+.gift-count-button[aria-pressed="true"] {
+  border-color: var(--sage-deep);
+  background: var(--sage-deep);
+  color: #fff;
+}
+
+.gift-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 8px 11px;
+  background: var(--mist);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.gift-count strong {
+  color: var(--sage-deep);
+  font-size: 1.05rem;
+}
+
+.gift-count-label {
+  font-size: 0.8rem;
+  font-weight: 750;
 }
 
 .fund-section {
@@ -715,6 +761,10 @@ input:focus-visible {
     grid-column: 1 / -1;
     justify-content: center;
   }
+
+  .gift-count-control {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 680px) {
@@ -809,6 +859,10 @@ input:focus-visible {
 
   .wish-actions .button-link {
     min-height: 34px;
+  }
+
+  .gift-count-control .gift-count-button {
+    width: auto;
   }
 
   .quick-amounts {

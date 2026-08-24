@@ -2,6 +2,9 @@ const STORAGE_KEY = "birthdayWishlistCollectedV4";
 const LEGACY_STORAGE_KEYS = ["birthdayWishlistCollected", "birthdayWishlistCollectedV2", "birthdayWishlistCollectedV3"];
 const RESERVATION_STORAGE_KEY = "wishlistReservationsV2";
 const LEGACY_RESERVATION_STORAGE_KEYS = ["wishlistReservations"];
+const CLIENT_TOKEN_STORAGE_KEY = "wishlistClientTokenV1";
+const GIFT_COUNTER_SELECTIONS_KEY = "wishlistGiftCounterSelectionsV1";
+const GIFT_COUNTER_CACHE_KEY = "wishlistGiftCounterCacheV1";
 const RESERVATION_REFRESH_MS = 4000;
 const RESERVATION_API_URL =
   "https://script.google.com/macros/s/AKfycby47Ypd1zEM2VjmQYGtLBh-4WzmwOGyAIiC-7RdYYAjZqqbcakVxnS_OMQgem7dON-krg/exec";
@@ -41,7 +44,8 @@ const targets = [
     image: "assets/handmade-gift.jpg?v=20260824",
     description: "Открытка, браслет, рисунок, маленькая поделка или что-то с душой. Такой подарок не обязан быть дорогим.",
     quickAmounts: [100, 300, 500],
-    reservable: true,
+    reservable: false,
+    giftCounter: true,
   },
   {
     id: "big-plush",
@@ -107,7 +111,8 @@ const targets = [
     description: "Прикольные лакомства для лошадей, которые можно взять на конюшню и угостить после тренировки.",
     quickAmounts: [100, 200, 300],
     link: "https://la-shop.com.ua/ua/plitka-konfetka-ot-likit-17246",
-    reservable: true,
+    reservable: false,
+    giftCounter: true,
   },
   {
     id: "fried-ice-cream-maker",
@@ -153,7 +158,12 @@ const toast = document.querySelector("#toast");
 
 let selectedTargetId = profile.mainTargetId;
 let reservations = {};
+let reservationOwnership = {};
+let giftCounts = {};
+let giftCounterSelections = loadGiftCounterSelections();
+const clientToken = getClientToken();
 let reservationsApiAvailable = canUseReservationApi();
+let sharedStateWriteInFlight = false;
 
 function formatMoney(value, currency = "UAH") {
   if (currency === "USD") {
@@ -166,8 +176,45 @@ function formatMoney(value, currency = "UAH") {
   return `${money.format(value)} грн`;
 }
 
+function formatPeopleCount(value) {
+  const count = Math.max(Number(value) || 0, 0);
+  const lastTwo = count % 100;
+  const last = count % 10;
+
+  if (lastTwo >= 11 && lastTwo <= 14) return "человек";
+  if (last === 1) return "человек";
+  if (last >= 2 && last <= 4) return "человека";
+  return "человек";
+}
+
 function getTarget(id) {
   return targets.find((target) => target.id === id);
+}
+
+function getClientToken() {
+  const saved = localStorage.getItem(CLIENT_TOKEN_STORAGE_KEY);
+  if (/^[0-9A-Za-z_-]{8,80}$/.test(saved || "")) return saved;
+
+  const token = typeof globalThis.crypto?.randomUUID === "function"
+    ? globalThis.crypto.randomUUID().replace(/-/g, "")
+    : `${Date.now().toString(36)}${Math.random().toString(36).slice(2)}${Math.random().toString(36).slice(2)}`;
+
+  localStorage.setItem(CLIENT_TOKEN_STORAGE_KEY, token);
+  return token;
+}
+
+function loadGiftCounterSelections() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(GIFT_COUNTER_SELECTIONS_KEY) || "[]");
+    return new Set(Array.isArray(saved) ? saved : []);
+  } catch (error) {
+    localStorage.removeItem(GIFT_COUNTER_SELECTIONS_KEY);
+    return new Set();
+  }
+}
+
+function saveGiftCounterSelections() {
+  localStorage.setItem(GIFT_COUNTER_SELECTIONS_KEY, JSON.stringify(Array.from(giftCounterSelections)));
 }
 
 function getSelectedTarget() {
@@ -249,12 +296,16 @@ function renderWishes() {
     const canContribute = hasJarLink(wish);
     const showsProgress = hasFixedPrice && canContribute;
     const left = Math.max(wish.price - wish.collected, 0);
-    const isReservable = wish.reservable !== false;
+    const hasGiftCounter = wish.giftCounter === true;
+    const isReservable = !hasGiftCounter && wish.reservable !== false;
     const reserved = isReservable && reservations[wish.id] === true;
+    const reservedByCurrentUser = reserved && reservationOwnership[wish.id] === true;
+    const counterSelected = hasGiftCounter && giftCounterSelections.has(wish.id);
 
     card.dataset.targetId = wish.id;
     card.tabIndex = 0;
     card.classList.toggle("is-reserved", reserved);
+    card.classList.toggle("is-counted", counterSelected);
     card.querySelector(".wish-image").src = wish.image;
     card.querySelector(".wish-image").alt = wish.title;
     card.querySelector(".wish-tag").textContent = wish.tag;
@@ -275,10 +326,16 @@ function renderWishes() {
       card.querySelector(".wish-progress").remove();
     }
 
-    card.querySelector(".reserve-status").hidden = !reserved;
+    const reserveStatus = card.querySelector(".reserve-status");
+    reserveStatus.hidden = !reserved;
+    reserveStatus.textContent = reservedByCurrentUser ? "Забронировано вами" : "Забронировано";
 
     card.addEventListener("click", (event) => {
       if (event.target.closest("button, a")) return;
+      if (hasGiftCounter) {
+        showToast(`Нажми «Я дарю», если тоже выбрала: ${wish.title}.`);
+        return;
+      }
       if (!canContribute) {
         showToast(`Можно забронировать: ${wish.title}.`);
         return;
@@ -308,12 +365,34 @@ function renderWishes() {
 
     const reserveButton = card.querySelector('[data-action="reserve"]');
     if (isReservable) {
-      reserveButton.textContent = reserved ? "Убрать бронь" : "Забронировать";
-      reserveButton.addEventListener("click", () => {
-        setReservation(wish.id, !reserved);
-      });
+      if (reserved && !reservedByCurrentUser) {
+        reserveButton.remove();
+      } else {
+        reserveButton.textContent = reserved ? "Убрать бронь" : "Забронировать";
+        reserveButton.addEventListener("click", () => {
+          setReservation(wish.id, !reserved);
+        });
+      }
     } else {
       reserveButton.remove();
+    }
+
+    const giftCounterControl = card.querySelector('[data-action="gift-count-control"]');
+    if (hasGiftCounter) {
+      const giftCounterButton = giftCounterControl.querySelector('[data-action="gift-count"]');
+      const giftCounterValue = giftCounterControl.querySelector("strong");
+      const giftCounterLabel = giftCounterControl.querySelector(".gift-count-label");
+      const count = giftCounts[wish.id] || 0;
+
+      giftCounterButton.textContent = counterSelected ? "Я дарю ✓" : "Я дарю";
+      giftCounterButton.setAttribute("aria-pressed", String(counterSelected));
+      giftCounterValue.textContent = String(count);
+      giftCounterLabel.textContent = formatPeopleCount(count);
+      giftCounterButton.addEventListener("click", () => {
+        setGiftCounter(wish.id, !counterSelected);
+      });
+    } else {
+      giftCounterControl.remove();
     }
 
     const productLink = card.querySelector('[data-action="product-link"]');
@@ -483,6 +562,8 @@ function requestRemoteReservations(params = {}) {
 }
 
 async function loadReservations() {
+  if (sharedStateWriteInFlight) return;
+
   try {
     LEGACY_RESERVATION_STORAGE_KEYS.forEach((key) => localStorage.removeItem(key));
     const apiUrl = getReservationApiUrl();
@@ -491,19 +572,23 @@ async function loadReservations() {
 
     let payload;
     if (isRemoteReservationApi()) {
-      payload = await requestRemoteReservations({ action: "list" });
+      payload = await requestRemoteReservations({ action: "list", token: clientToken });
     } else {
-      const response = await fetch(apiUrl, { cache: "no-store" });
+      const url = new URL(apiUrl, window.location.href);
+      url.searchParams.set("token", clientToken);
+      const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) throw new Error("Reservation API unavailable");
       payload = await response.json();
     }
 
     reservationsApiAvailable = true;
-    reservations = normalizeReservations(payload);
+    applySharedGiftState(payload);
     localStorage.removeItem(RESERVATION_STORAGE_KEY);
   } catch (error) {
     reservationsApiAvailable = false;
     reservations = normalizeReservations(JSON.parse(localStorage.getItem(RESERVATION_STORAGE_KEY) || "{}"));
+    reservationOwnership = { ...reservations };
+    giftCounts = normalizeGiftCounts(JSON.parse(localStorage.getItem(GIFT_COUNTER_CACHE_KEY) || "{}"));
   }
 
   renderWishes();
@@ -514,15 +599,47 @@ function normalizeReservations(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
 
   return Object.fromEntries(
-    Object.entries(value).filter(([targetId, reserved]) => getTarget(targetId) && reserved === true),
+    Object.entries(value).filter(([targetId, reserved]) => {
+      const target = getTarget(targetId);
+      return target && target.giftCounter !== true && target.reservable !== false && reserved === true;
+    }),
   );
 }
 
+function normalizeReservationOwnership(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return normalizeReservations(value.__owned);
+}
+
+function normalizeGiftCounts(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+
+  return Object.fromEntries(
+    Object.entries(value).filter(([targetId, count]) => {
+      const target = getTarget(targetId);
+      return target?.giftCounter === true && Number.isFinite(count) && count >= 0;
+    }),
+  );
+}
+
+function applySharedGiftState(payload) {
+  reservations = normalizeReservations(payload);
+  reservationOwnership = normalizeReservationOwnership(payload);
+  giftCounts = normalizeGiftCounts(payload);
+  localStorage.setItem(GIFT_COUNTER_CACHE_KEY, JSON.stringify(giftCounts));
+}
+
 async function setReservation(targetId, reserved) {
+  if (!reserved && reservationOwnership[targetId] !== true) return;
+  if (reserved && reservations[targetId] === true) return;
+
   reservations[targetId] = reserved;
+  reservationOwnership[targetId] = reserved;
   reservations = normalizeReservations(reservations);
+  reservationOwnership = normalizeReservations(reservationOwnership);
   renderWishes();
   updateSelectionUI();
+  sharedStateWriteInFlight = true;
 
   try {
     const apiUrl = getReservationApiUrl();
@@ -535,12 +652,13 @@ async function setReservation(targetId, reserved) {
         action: "set",
         id: targetId,
         reserved: reserved ? "1" : "0",
+        token: clientToken,
       });
     } else {
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ id: targetId, reserved }),
+        body: JSON.stringify({ id: targetId, reserved, token: clientToken }),
       });
 
       if (!response.ok) throw new Error("Reservation API unavailable");
@@ -548,15 +666,73 @@ async function setReservation(targetId, reserved) {
     }
 
     reservationsApiAvailable = true;
-    reservations = normalizeReservations(payload);
+    applySharedGiftState(payload);
   } catch (error) {
     reservationsApiAvailable = false;
     localStorage.setItem(RESERVATION_STORAGE_KEY, JSON.stringify(reservations));
+  } finally {
+    sharedStateWriteInFlight = false;
   }
 
   renderWishes();
   updateSelectionUI();
   showToast(reserved ? "Подарок забронирован." : "Бронь убрана.");
+}
+
+async function setGiftCounter(targetId, active) {
+  const target = getTarget(targetId);
+  if (target?.giftCounter !== true) return;
+
+  const wasSelected = giftCounterSelections.has(targetId);
+  if (wasSelected === active) return;
+
+  if (active) {
+    giftCounterSelections.add(targetId);
+  } else {
+    giftCounterSelections.delete(targetId);
+  }
+
+  giftCounts[targetId] = Math.max((giftCounts[targetId] || 0) + (active ? 1 : -1), 0);
+  saveGiftCounterSelections();
+  localStorage.setItem(GIFT_COUNTER_CACHE_KEY, JSON.stringify(giftCounts));
+  renderWishes();
+  updateSelectionUI();
+  sharedStateWriteInFlight = true;
+
+  try {
+    const apiUrl = getReservationApiUrl();
+    if (!reservationsApiAvailable || !apiUrl) throw new Error("Reservation API unavailable");
+
+    let payload;
+    if (isRemoteReservationApi()) {
+      payload = await requestRemoteReservations({
+        action: "count",
+        id: targetId,
+        active: active ? "1" : "0",
+        token: clientToken,
+      });
+    } else {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ action: "count", id: targetId, active, token: clientToken }),
+      });
+
+      if (!response.ok) throw new Error("Reservation API unavailable");
+      payload = await response.json();
+    }
+
+    reservationsApiAvailable = true;
+    applySharedGiftState(payload);
+  } catch (error) {
+    reservationsApiAvailable = false;
+  } finally {
+    sharedStateWriteInFlight = false;
+  }
+
+  renderWishes();
+  updateSelectionUI();
+  showToast(active ? `Отмечено: ${target.title}.` : `Отметка снята: ${target.title}.`);
 }
 
 document.querySelectorAll("[data-amount]").forEach((button) => {

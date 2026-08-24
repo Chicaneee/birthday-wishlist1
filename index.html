@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Подарок на день рождения</title>
-    <link rel="stylesheet" href="styles.css?v=20260824" />
+    <link rel="stylesheet" href="styles.css?v=20260824e" />
   </head>
   <body>
     <header class="site-header" aria-label="Главная навигация">
@@ -115,8 +115,8 @@
             </article>
             <article tabindex="0" data-scroll-target="#wishlist">
               <span>03</span>
-              <h3>Забронировать</h3>
-              <p>Если хочется подарить вещь, можно отметить её как забронированную.</p>
+              <h3>Отметить подарок</h3>
+              <p>Для вещей можно поставить бронь, а у подарков, которых может быть несколько, нажать «Я дарю».</p>
             </article>
           </div>
         </div>
@@ -148,12 +148,16 @@
           <div class="wish-actions">
             <button class="button button-primary" type="button" data-action="partial">Внести часть</button>
             <button class="button button-ghost" type="button" data-action="reserve">Забронировать</button>
+            <div class="gift-count-control" data-action="gift-count-control">
+              <button class="button button-ghost gift-count-button" type="button" data-action="gift-count" aria-pressed="false">Я дарю</button>
+              <span class="gift-count" aria-live="polite"><strong>0</strong><span class="gift-count-label">человек</span></span>
+            </div>
             <a class="button button-link" target="_blank" rel="noopener" data-action="product-link">Перейти к товару</a>
           </div>
         </div>
       </article>
     </template>
 
-    <script src="app.js?v=20260824"></script>
+    <script src="app.js?v=20260824e"></script>
   </body>
 </html>
