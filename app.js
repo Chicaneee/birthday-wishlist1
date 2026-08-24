@@ -42,7 +42,7 @@ const targets = [
     collected: 0,
     currency: "UAH",
     image: "assets/handmade-gift.jpg?v=20260824",
-    description: "Открытка, браслет, рисунок, маленькая поделка или что-то с душой. Такой подарок не обязан быть дорогим.",
+    description: "Открытка, браслет, рисунок, маленькая поделка или что-то с душой.",
     quickAmounts: [100, 300, 500],
     reservable: false,
     giftCounter: true,
@@ -332,6 +332,10 @@ function renderWishes() {
 
     card.addEventListener("click", (event) => {
       if (event.target.closest("button, a")) return;
+      if (reserved) {
+        showToast("Этот подарок уже забронирован.");
+        return;
+      }
       if (hasGiftCounter) {
         showToast(`Нажми «Я дарю», если тоже выбрала: ${wish.title}.`);
         return;
@@ -396,7 +400,7 @@ function renderWishes() {
     }
 
     const productLink = card.querySelector('[data-action="product-link"]');
-    if (wish.link) {
+    if (wish.link && !reserved) {
       productLink.href = wish.link;
     } else {
       productLink.remove();
