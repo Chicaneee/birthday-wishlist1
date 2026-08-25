@@ -2,8 +2,10 @@ const RESERVATION_STORE_KEY = "wishlist_reservations";
 const COUNTER_STORE_KEY = "wishlist_gift_counters";
 const RESERVATION_IDS = [
   "big-plush",
+  "horse-themed-gift",
   "cat-photo-pillow",
   "night-light",
+  "room-decor",
   "soap-dispenser",
   "fried-ice-cream-maker",
 ];
